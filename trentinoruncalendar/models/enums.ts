@@ -1,0 +1,16 @@
+export const interest = {
+    track : "Pista",
+    road : "Strada",
+    mountain : "Montagna",
+    trail : "Trail",
+    crossCountry : "Cross",
+    ultra : "Ultra",
+    marathon : "Maratona",
+    halfMarathon : "Mezza Maratona",
+    sprint : "Sprint",
+    obstacle : "Ostacolo",
+    funRun : "Corsa non Agonsitica",
+    charity : "Beneficenza",
+    virtual : "Virtual",
+    other : "Altro",
+} as const;

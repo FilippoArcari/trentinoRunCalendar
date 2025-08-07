@@ -1,0 +1,2 @@
+JWT_SECRET=ciao
+MONGO_URI=mongodb+srv://filippoarcari2004:IGuFFfx1wbEQ4CYx@trentinoruncalendar.wgdbxio.mongodb.net/
