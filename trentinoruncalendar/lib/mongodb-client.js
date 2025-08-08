@@ -10,13 +10,15 @@ if (!uri) {
 	throw new Error("Please define the MONGODB_URI environment variable");
 }
 
-if (!clientPromise) {
+if (process.env.NODE_ENV === "development") {
+	if (!global._mongoClientPromise) {
+		client = new MongoClient(uri, options);
+		global._mongoClientPromise = client.connect();
+	}
+	clientPromise = global._mongoClientPromise;
+} else {
 	client = new MongoClient(uri, options);
 	clientPromise = client.connect();
 }
 
-export default async function dbConnect() {
-	const client = await clientPromise;
-	const db = client.db("trentinoRunCalendarDb");
-	return db;
-}
+export default clientPromise;

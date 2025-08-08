@@ -1,15 +1,5 @@
 import dbConnect from "../mongodb";
-type RaceServiceProps = {
-	id: string;
-	idowner: string;
-	title: string;
-	description: string;
-	length: number;
-	data: Date;
-	principalimage?: string;
-	otherImage?: string[];
-};
-
+import { RaceServiceProps } from "../interfaces/IRaceService";
 class RaceService {
 	id: string;
 	idowner: string;
@@ -28,6 +18,7 @@ class RaceService {
 	constructor(id: string);
 	constructor(props: RaceServiceProps);
 	constructor(arg: string | RaceServiceProps) {
+
 		if (typeof arg === "string") {
 			// Construct from id only
 			this.id = arg;
@@ -50,7 +41,7 @@ class RaceService {
 		}
 	}
 	private async refreshRace(race: RaceServiceProps) {
-		this.id = race.id;
+		this.id = race.id || "";
 		this.idowner = race.idowner;
 		this.title = race.title;
 		this.description = race.description;
@@ -61,7 +52,7 @@ class RaceService {
 	}
 	async getRaceById(id: string) {
 		const db = await dbConnect();
-		const res = await db.collection("races").findOne({ id });
+		const res = await db.collection("race").findOne({ id });
 		this.refreshRace(res as RaceServiceProps);
 	}
 	async saveRace() {
@@ -79,36 +70,45 @@ class RaceService {
 			latitude: this.latitude,
 			typology: this.typology,
 		};
-		const result = await db.collection("races").insertOne(raceData);
+		const result = await db.collection("race").insertOne(raceData);
 		this.refreshRace(result as RaceServiceProps);
 	}
-	async updateRace() {
+	async updateRace(newData: RaceServiceProps) {
 		const db = await dbConnect();
 		const raceData = {
-			idowner: this.idowner,
-			title: this.title,
-			description: this.description,
-			length: this.length,
-			data: this.data,
-			principalimage: this.principalimage,
-			otherImage: this.otherImage,
-			createdAt: this.createdAt || new Date(),
-			longitude: this.longitude,
-			latitude: this.latitude,
-			typology: this.typology,
+			idowner: newData.idowner,
+			title: newData.title,
+			description: newData.description,
+			length: newData.length,
+			data: newData.data,
+			principalimage: newData.principalimage,
+			otherImage: newData.otherImage,
+			createdAt: newData.createdAt || new Date(),
+			longitude: newData.longitude,
+			latitude: newData.latitude,
+			typology: newData.typology,
 		};
 		const res = await db
-			.collection("races")
+			.collection("Race")
 			.updateOne({ id: this.id }, { $set: raceData });
 		this.refreshRace(res as RaceServiceProps);
+		if (res.modifiedCount === 1) {
+			return this;
+		}else {
+			return null;
+		}
 	}
 	async deleteRace() {
 		const db = await dbConnect();
-		await db.collection("races").deleteOne({ id: this.id });
+		const res = await db.collection("race").deleteOne({ id: this.id });
+		if (res.deletedCount === 1) {
+			return true;
+		}
+		return false;
 	}
-	async getAllRaces() {
+	static async getAllRaces() {
 		const db = await dbConnect();
-		const races = await db.collection("races").find({}).toArray();
+		const races = await db.collection("race").find({}).toArray();
 		return races;
 	}
 
